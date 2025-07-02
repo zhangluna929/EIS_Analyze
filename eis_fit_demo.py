@@ -10,9 +10,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.optimize import least_squares
 
-# -----------------------------
-# 工具函数
-# -----------------------------
 
 def load_eis_csv(file_path: Path):
     """读取 csv，要求列：freq, Zreal, Zimag"""
@@ -21,14 +18,13 @@ def load_eis_csv(file_path: Path):
     z_complex = df["Zreal"].values + 1j * df["Zimag"].values
     return freq, z_complex
 
-# CPE 元件阻抗
+
 Z_cpe = lambda Q, n, w: 1 / (Q * (1j * w) ** n)
-# Warburg 元件阻抗（半无限扩散）
+
 Z_w = lambda sigma, w: (sigma / np.sqrt(w)) * (1 - 1j)
 
-# -----------------------------
+
 # 等效电路模型
-# -----------------------------
 
 def model_A(p, w):
     """R_s + (R_ct ‖ C)"""
@@ -65,17 +61,15 @@ MODEL_DICT = {
     "D": (model_D, [1, 100, 1e-4, 0.8, 10]),
 }
 
-# -----------------------------
-# 拟合函数
-# -----------------------------
+
+# 拟合
 
 def residuals(p, w, z_exp, model_func):
     z_mod = model_func(p, w)
     return np.concatenate([(z_mod.real - z_exp.real), (z_mod.imag - z_exp.imag)])
 
-# -----------------------------
 # 绘图
-# -----------------------------
+
 
 def plot_eis(freq, z_exp, z_fit):
     # Nyquist
@@ -99,9 +93,7 @@ def plot_eis(freq, z_exp, z_fit):
     plt.xlabel('频率 / Hz'); plt.ylabel('相位 / °'); plt.title('Bode Phase'); plt.legend()
     plt.tight_layout(); plt.savefig('bode_phase_fit.png', dpi=300); plt.show()
 
-# -----------------------------
-# 主函数
-# -----------------------------
+
 
 def main():
     if len(sys.argv) < 3:
