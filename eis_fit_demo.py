@@ -5,7 +5,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.optimize import least_squares
 
-# 数据加载函数
 def load_eis_data(file_path: Path):
     """
     加载EIS实验数据。要求csv文件包含列：'freq', 'Zreal', 'Zimag'。
@@ -21,7 +20,6 @@ def load_eis_data(file_path: Path):
         print(f"加载数据时出错: {e}")
         sys.exit(1)
 
-# 等效电路模型
 def Z_cpe(Q, n, w): return 1 / (Q * (1j * w) ** n)  # 常见的CPE元件模型
 
 def Z_w(sigma, w): return (sigma / np.sqrt(w)) * (1 - 1j)  # Warburg阻抗模型
@@ -54,7 +52,6 @@ def model_D(p, w):
     Z_par = 1 / (1 / R_ct + 1 / Z_q)
     return R_s + Z_par + Z_w(sigma, w)
 
-# 选择模型字典
 MODEL_DICT = {
     "A": (model_A, [1, 100, 1e-5]),
     "B": (model_B, [1, 100, 1e-4, 0.8]),
@@ -62,12 +59,10 @@ MODEL_DICT = {
     "D": (model_D, [1, 100, 1e-4, 0.8, 10]),
 }
 
-# 拟合函数
 def residuals(p, w, z_exp, model_func):
     z_mod = model_func(p, w)
     return np.concatenate([(z_mod.real - z_exp.real), (z_mod.imag - z_exp.imag)])
 
-# 绘图函数
 def plot_eis(freq, z_exp, z_fit):
     """
     绘制Nyquist图与Bode图。
@@ -111,7 +106,6 @@ def plot_eis(freq, z_exp, z_fit):
     plt.savefig('bode_phase_fit.png', dpi=300)
     plt.show()
 
-# 主函数
 def main():
     if len(sys.argv) < 3:
         print("用法: python eis_fit.py data.csv A|B|C|D")
@@ -124,23 +118,18 @@ def main():
         print("模型必须是 A、B、C 或 D")
         sys.exit(1)
 
-    # 加载数据
     freq, z_exp = load_eis_data(csv_path)
     w = 2 * np.pi * freq  # 角频率
 
-    # 选择模型
     model_func, p0 = MODEL_DICT[model_key]
-    
-    # 拟合过程
+
     res = least_squares(residuals, p0, args=(w, z_exp, model_func), max_nfev=8000)
     z_fit = model_func(res.x, w)
 
-    # 打印拟合参数
     print("拟合参数：")
     for i, param in enumerate(res.x, 1):
         print(f"p{i} = {param:.4e}")
 
-    # 绘制图像
     plot_eis(freq, z_exp, z_fit)
 
 if __name__ == "__main__":
