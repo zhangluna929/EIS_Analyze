@@ -20,9 +20,9 @@ def load_eis_data(file_path: Path):
         print(f"加载数据时出错: {e}")
         sys.exit(1)
 
-def Z_cpe(Q, n, w): return 1 / (Q * (1j * w) ** n)  # 常见的CPE元件模型
+def Z_cpe(Q, n, w): return 1 / (Q * (1j * w) ** n)  
 
-def Z_w(sigma, w): return (sigma / np.sqrt(w)) * (1 - 1j)  # Warburg阻抗模型
+def Z_w(sigma, w): return (sigma / np.sqrt(w)) * (1 - 1j)  
 
 def model_A(p, w):
     """模型 A: R_s + (R_ct ‖ C)"""
@@ -70,7 +70,7 @@ def plot_eis(freq, z_exp, z_fit):
     :param z_exp: 实验数据
     :param z_fit: 拟合数据
     """
-    # Nyquist图
+ 
     plt.figure(figsize=(5,4))
     plt.plot(z_exp.real, -z_exp.imag, 'o', ms=4, label='实验数据')
     plt.plot(z_fit.real, -z_fit.imag, '-', label='拟合数据')
@@ -94,7 +94,6 @@ def plot_eis(freq, z_exp, z_fit):
     plt.savefig('bode_mag_fit.png', dpi=300)
     plt.show()
 
-    # Bode图 相位
     plt.figure(figsize=(5,4))
     plt.semilogx(freq, np.angle(z_exp, deg=True), 'o', ms=4, label='实验数据')
     plt.semilogx(freq, np.angle(z_fit, deg=True), '-', label='拟合数据')
@@ -119,7 +118,7 @@ def main():
         sys.exit(1)
 
     freq, z_exp = load_eis_data(csv_path)
-    w = 2 * np.pi * freq  # 角频率
+    w = 2 * np.pi * freq  
 
     model_func, p0 = MODEL_DICT[model_key]
 
